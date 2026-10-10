@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Where To? Vacation Planner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#eef3f1;--card:#fff;--ink:#0f2b3d;--mute:#5b7080;--line:#d5dfdc;--sea:#1f7a8c;--sun:#f2a900;--sunink:#3a2a00;--ok:#1b7a4b;--bad:#b3261e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1a24;--card:#142a38;--ink:#e8f1f5;--mute:#93a9b7;--line:#254153;--sea:#4fb3c6;--ok:#58c58d;--bad:#ff8a80}}
+:root[data-theme="dark"]{--bg:#0c1a24;--card:#142a38;--ink:#e8f1f5;--mute:#93a9b7;--line:#254153;--sea:#4fb3c6;--ok:#58c58d;--bad:#ff8a80}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 'DM Sans',system-ui,sans-serif}
+h1,h2,h3{font-family:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;margin:0;line-height:1.1}
+main{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+.brand{font:800 22px 'Bricolage Grotesque',sans-serif;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.brand i{width:14px;height:14px;border-radius:50%;background:var(--sun);display:inline-block}
+.prog{display:flex;gap:6px;margin-bottom:22px}
+.prog b{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.prog b.on{background:var(--sea)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+h2{font-size:30px;margin-bottom:6px}
+.sub{color:var(--mute);margin:0 0 20px}
+label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px}
+input,select{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+input:focus,select:focus,button:focus-visible,a:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 16px;border:1.5px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);font:500 15px 'DM Sans',sans-serif;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.moods{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.mood{text-align:left;padding:14px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.mood strong{display:block;font-size:17px}.mood span{color:var(--mute);font-size:13px}
+.mood[aria-pressed="true"]{border-color:var(--sea);box-shadow:inset 0 0 0 2px var(--sea)}
+.row{display:flex;gap:12px}.row>*{flex:1}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:24px}
+.btn{padding:13px 22px;border-radius:10px;border:0;font:700 16px 'DM Sans',sans-serif;cursor:pointer;background:var(--sun);color:var(--sunink);text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.err{color:var(--bad);font-size:14px;margin-top:10px;min-height:20px}
+.pass{background:var(--ink);color:var(--bg);border-radius:18px;padding:24px;position:relative;overflow:hidden}
+.pass h2{font-size:38px;color:var(--bg)}
+.pass .route{opacity:.8;margin:4px 0 16px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;border-top:2px dashed rgba(255,255,255,.3);padding-top:16px}
+.tiles div small{display:block;opacity:.7;font-size:12px}.tiles div b{font:800 22px 'Bricolage Grotesque',sans-serif}
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:700;margin-top:10px}
+.tag.ok{background:var(--sun);color:var(--sunink)}.tag.bad{background:var(--bad);color:#fff}
+section.blk{margin-top:18px}
+section.blk h3{font-size:21px;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left}
+td:last-child,th:last-child{text-align:right}
+.scroll{overflow-x:auto}
+tr.pick td{font-weight:700;color:var(--sea)}
+ol.days{margin:0;padding-left:20px}ol.days li{margin-bottom:10px}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a{padding:10px 14px;border:1.5px solid var(--sea);border-radius:10px;color:var(--sea);font-weight:700;text-decoration:none;font-size:14px}
+.note{color:var(--mute);font-size:13px;margin-top:10px}
+@media(max-width:480px){.row{flex-direction:column}.tiles b{font-size:18px}h2{font-size:26px}}
+</style>
+</head>
+<body>
+<main>
+<div class="brand"><i></i>Where To?</div>
+<div class="prog" id="prog"></div>
+<div id="app"></div>
+</main>
+<script>
+const mk=s=>Object.fromEntries(s.split(';').map(x=>{const a=x.split(',');return[a[0],[+a[1],+a[2]]]}));
+const INDIA=mk('Anand,22.556,72.951;Ahmedabad,23.023,72.571;Vadodara,22.307,73.181;Surat,21.17,72.831;Rajkot,22.304,70.8;Gandhinagar,23.215,72.637;Bhavnagar,21.765,72.152;Jamnagar,22.47,70.058;Bhuj,23.242,69.666;Mumbai,19.076,72.878;Pune,18.52,73.857;Nashik,19.998,73.79;Nagpur,21.146,79.088;Delhi,28.61,77.209;Jaipur,26.912,75.787;Jodhpur,26.239,73.024;Udaipur,24.585,73.712;Agra,27.177,78.008;Lucknow,26.847,80.947;Kanpur,26.449,80.332;Varanasi,25.317,82.973;Patna,25.594,85.137;Ranchi,23.344,85.31;Kolkata,22.57,88.36;Bhubaneswar,20.296,85.824;Guwahati,26.144,91.736;Indore,22.72,75.857;Bhopal,23.26,77.413;Raipur,21.251,81.63;Chandigarh,30.733,76.779;Ludhiana,30.901,75.857;Amritsar,31.634,74.872;Shimla,31.105,77.173;Srinagar,34.084,74.797;Dehradun,30.316,78.032;Hyderabad,17.385,78.487;Vijayawada,16.506,80.648;Visakhapatnam,17.687,83.218;Bengaluru,12.97,77.59;Mysuru,12.296,76.639;Mangaluru,12.915,74.856;Chennai,13.083,80.27;Coimbatore,11.017,76.956;Madurai,9.925,78.12;Kochi,9.931,76.267;Thiruvananthapuram,8.524,76.937;Panaji,15.499,73.828;Agartala,23.8,91.3;Aizawl,23.7,92.7;Ajmer,26.4,74.6;Aligarh,27.9,78.1;Alwar,27.6,76.6;Ambala,30.4,76.8;Amravati,20.9,77.8;Anantapur,14.7,77.6;Asansol,23.7,87;Aurangabad,19.9,75.3;Ballari,15.1,76.9;Bareilly,28.4,79.4;Belagavi,15.9,74.5;Bharuch,21.7,73;Bhilai,21.2,81.4;Bhilwara,25.3,74.6;Bikaner,28,73.3;Bilaspur,22.1,82.1;Cuttack,20.5,85.9;Dahod,22.8,74.3;Darbhanga,26.2,85.9;Davangere,14.5,75.9;Dhanbad,23.8,86.4;Dibrugarh,27.5,95;Durgapur,23.5,87.3;Erode,11.3,77.7;Faridabad,28.4,77.3;Gangtok,27.3,88.6;Gaya,24.8,85;Ghaziabad,28.7,77.4;Godhra,22.8,73.6;Gorakhpur,26.8,83.4;Guntur,16.3,80.4;Gurugram,28.5,77;Gwalior,26.2,78.2;Haridwar,29.9,78.2;Hubballi,15.4,75.1;Imphal,24.8,93.9;Itanagar,27.1,93.6;Jabalpur,23.2,79.9;Jalandhar,31.3,75.6;Jammu,32.7,74.9;Jamshedpur,22.8,86.2;Jhansi,25.4,78.6;Junagadh,21.5,70.5;Kakinada,17,82.2;Kalaburagi,17.3,76.8;Kannur,11.9,75.4;Karimnagar,18.4,79.1;Kohima,25.7,94.1;Kolhapur,16.7,74.2;Kollam,8.9,76.6;Kota,25.2,75.8;Kozhikode,11.3,75.8;Kurnool,15.8,78;Leh,34.2,77.6;Meerut,29,77.7;Mehsana,23.6,72.4;Morbi,22.8,70.8;Moradabad,28.8,78.8;Muzaffarpur,26.1,85.4;Nadiad,22.7,72.9;Nanded,19.2,77.3;Navi Mumbai,19,73;Navsari,20.9,72.9;Nellore,14.4,80;Nizamabad,18.7,78.1;Noida,28.5,77.4;Palakkad,10.8,76.7;Palanpur,24.2,72.4;Panipat,29.4,77;Patan,23.8,72.1;Porbandar,21.6,69.6;Port Blair,11.6,92.7;Prayagraj,25.4,81.8;Puducherry,11.9,79.8;Rajahmundry,17,81.8;Rohtak,28.9,76.6;Rourkela,22.3,84.9;Salem,11.7,78.2;Sangli,16.9,74.6;Secunderabad,17.4,78.5;Shillong,25.6,91.9;Shivamogga,13.9,75.6;Sikar,27.6,75.1;Siliguri,26.7,88.4;Silchar,24.8,92.8;Solapur,17.7,75.9;Thane,19.2,73;Thanjavur,10.8,79.1;Thrissur,10.5,76.2;Tiruchirappalli,10.8,78.7;Tirunelveli,8.7,77.7;Tirupati,13.6,79.4;Tiruppur,11.1,77.3;Tumakuru,13.3,77.1;Udupi,13.3,74.7;Ujjain,23.2,75.8;Valsad,20.6,72.9;Vellore,12.9,79.1;Warangal,18,79.6');
+const WORLD=mk('Dubai,25.2,55.27;Abu Dhabi,24.453,54.377;Doha,25.285,51.531;Riyadh,24.713,46.675;Muscat,23.588,58.383;Kuwait City,29.376,47.99;Tel Aviv,32.085,34.781;Colombo,6.927,79.861;Kathmandu,27.717,85.324;Dhaka,23.81,90.41;Karachi,24.861,67.01;Lahore,31.55,74.344;Singapore,1.352,103.82;Kuala Lumpur,3.139,101.687;Bangkok,13.756,100.502;Jakarta,-6.208,106.846;Manila,14.6,120.984;Hanoi,21.028,105.854;Ho Chi Minh City,10.823,106.63;Hong Kong,22.32,114.17;Shanghai,31.23,121.474;Beijing,39.904,116.407;Tokyo,35.68,139.69;Osaka,34.694,135.502;Seoul,37.566,126.978;Sydney,-33.87,151.21;Melbourne,-37.814,144.963;Perth,-31.95,115.86;Auckland,-36.848,174.763;London,51.507,-0.128;Manchester,53.481,-2.243;Dublin,53.35,-6.26;Paris,48.857,2.352;Berlin,52.52,13.405;Frankfurt,50.11,8.682;Amsterdam,52.37,4.895;Madrid,40.417,-3.704;Barcelona,41.385,2.173;Lisbon,38.722,-9.139;Rome,41.903,12.496;Milan,45.464,9.19;Zurich,47.377,8.54;Vienna,48.208,16.373;Athens,37.984,23.728;Istanbul,41.008,28.978;Moscow,55.756,37.617;Stockholm,59.329,18.069;Cairo,30.044,31.236;Casablanca,33.573,-7.589;Nairobi,-1.286,36.82;Lagos,6.524,3.379;Johannesburg,-26.204,28.047;Cape Town,-33.925,18.424;New York,40.713,-74.006;Boston,42.36,-71.059;Washington DC,38.907,-77.037;Atlanta,33.749,-84.388;Miami,25.762,-80.192;Chicago,41.878,-87.63;Houston,29.76,-95.37;Dallas,32.777,-96.797;Toronto,43.653,-79.383;Vancouver,49.283,-123.121;Seattle,47.606,-122.332;San Francisco,37.775,-122.419;Los Angeles,34.052,-118.244;Mexico City,19.433,-99.133;Bogota,4.711,-74.072;Lima,-12.046,-77.043;Santiago,-33.449,-70.669;Buenos Aires,-34.604,-58.382;Sao Paulo,-23.55,-46.633;Rio de Janeiro,-22.907,-43.173');
+const CITIES={...INDIA,...WORLD},INC=new Set(Object.keys(INDIA));
+const ALIAS={bangalore:'Bengaluru',bombay:'Mumbai',madras:'Chennai',calcutta:'Kolkata',trivandrum:'Thiruvananthapuram',mysore:'Mysuru',baroda:'Vadodara',cochin:'Kochi',poona:'Pune',vizag:'Visakhapatnam',banaras:'Varanasi',benares:'Varanasi',gurgaon:'Gurugram',allahabad:'Prayagraj',pondicherry:'Puducherry',mangalore:'Mangaluru',panjim:'Panaji',goa:'Panaji',belgaum:'Belagavi',bhubaneshwar:'Bhubaneswar',gauhati:'Guwahati','new delhi':'Delhi',trichy:'Tiruchirappalli',calicut:'Kozhikode'};
+const isIN=o=>INC.has(o)||(!(o in WORLD)&&CITIES[o][0]>6&&CITIES[o][0]<36&&CITIES[o][1]>68&&CITIES[o][1]<98);
+// m: mood scores 0-3. E=Educational F=Fun R=Relaxing A=Adventure S=Spiritual N=Nature
+const D=[
+{n:'Statue of Unity, Kevadia',la:21.838,lo:73.719,h:2200,f:400,m:{E:3,F:2,N:2,R:1},hl:['Statue of Unity and viewing gallery','Sardar Sarovar Dam and Valley of Flowers','Jungle safari and Narmada boating']},
+{n:'Champaner-Pavagadh',la:22.485,lo:73.535,h:1500,f:350,m:{E:3,S:3,N:1,A:1},hl:['UNESCO Champaner heritage ruins','Pavagadh hill and Kalika Mata temple','Jami Masjid and Hathi Pol']},
+{n:'Diu',la:20.714,lo:70.987,h:2300,f:500,m:{R:3,F:2,N:1},hl:['Nagoa and Ghoghla beaches','Diu Fort and St Paul\'s Church','Sunset at Gangeshwar temple']},
+{n:'Gir National Park',la:21.124,lo:70.824,h:2800,f:450,m:{N:3,A:3,E:1,R:1},hl:['Morning lion safari','Devaliya Safari Park','Kamleshwar Dam and village walk']},
+{n:'Somnath and Dwarka',la:22.238,lo:68.968,h:1800,f:380,m:{S:3,E:2,R:1},hl:['Somnath Jyotirlinga temple','Dwarkadhish temple','Bet Dwarka ferry and Nageshwar']},
+{n:'White Rann of Kutch',la:23.85,lo:69.67,h:3500,f:450,m:{N:3,E:2,A:2,R:1},hl:['White salt desert at sunset','Bhuj: Aina Mahal and Prag Mahal','Kala Dungar and handicraft villages']},
+{n:'Mount Abu',la:24.593,lo:72.708,h:2400,f:420,m:{R:3,F:2,N:2,S:2},hl:['Nakki Lake boating','Dilwara Jain temples','Sunset Point and Guru Shikhar']},
+{n:'Saputara',la:20.575,lo:73.75,h:2200,f:400,m:{R:3,N:3,F:1},hl:['Lake and Sunrise Point','Rose garden and ropeway','Gira Waterfalls and tribal museum']},
+{n:'Udaipur',la:24.585,lo:73.712,h:2800,f:500,m:{R:3,F:2,E:2,S:1},hl:['City Palace and Lake Pichola boat','Sajjangarh and Fateh Sagar','Old city walk and Bagore ki Haveli show']},
+{n:'Jaipur',la:26.912,lo:75.787,h:2500,f:500,m:{E:3,F:2,S:1},hl:['Amer Fort and Jaigarh','City Palace and Jantar Mantar','Hawa Mahal and bazaar food walk']},
+{n:'Lonavala and Khandala',la:18.75,lo:73.41,h:3000,f:500,m:{F:3,R:2,A:2,N:3},hl:['Bhushi Dam and Tiger Point','Karla and Bhaja caves','Rajmachi trek and chikki shopping']},
+{n:'Mumbai',la:19.076,lo:72.878,h:4000,f:600,m:{F:3,E:3,R:1},hl:['Gateway of India and Elephanta Caves','CSMT and museum at Kala Ghoda','Marine Drive and Juhu street food']},
+{n:'Ajanta and Ellora',la:19.876,lo:75.343,h:2200,f:400,m:{E:3,S:2,N:1},hl:['Ellora rock-cut Kailasa temple','Ajanta cave paintings','Daulatabad Fort and Bibi ka Maqbara']},
+{n:'Goa',la:15.5,lo:73.83,h:3500,f:650,m:{F:3,R:3,A:2,E:1},hl:['Baga, Calangute and Anjuna beaches','Old Goa churches and Fontainhas','Water sports and Dudhsagar falls']},
+{n:'Hampi',la:15.335,lo:76.46,h:1800,f:380,m:{E:3,A:2,S:2,N:1},hl:['Virupaksha temple and Vittala complex','Sunrise at Matanga Hill','Coracle ride on Tungabhadra']},
+{n:'Rishikesh',la:30.087,lo:78.267,h:2200,f:400,m:{S:3,A:3,R:2,N:2},hl:['Ganga aarti at Triveni Ghat','River rafting and bungee','Yoga session and Laxman Jhula']},
+{n:'Manali',la:32.24,lo:77.19,h:3000,f:500,m:{A:3,N:3,R:2,F:2},hl:['Old Manali and Hadimba temple','Solang Valley adventure','Rohtang or Atal Tunnel day trip']},
+{n:'Munnar',la:10.089,lo:77.06,h:3200,f:480,m:{R:3,N:3,F:1},hl:['Tea garden walks and museum','Eravikulam National Park','Mattupetty Dam and Top Station']},
+{x:1,n:'Dubai',la:25.2,lo:55.27,h:9000,f:1800,m:{F:3,R:2,A:2,E:1},hl:['Burj Khalifa and Dubai Mall','Desert safari and dune dinner','Old Dubai souks and Creek abra ride']},
+{x:1,n:'Singapore',la:1.352,lo:103.82,h:11000,f:1800,m:{F:3,E:2,N:1,R:1},hl:['Gardens by the Bay and Marina Bay','Sentosa and Universal Studios','Hawker centres and Little India']},
+{x:1,n:'Bangkok',la:13.756,lo:100.502,h:3500,f:900,m:{F:3,E:2,S:2,R:1},hl:['Grand Palace and Wat Pho','Floating markets and street food','Chao Phraya river cruise']},
+{x:1,n:'Phuket',la:7.88,lo:98.39,h:4500,f:900,m:{R:3,F:2,A:2,N:2},hl:['Patong and Kata beaches','Phi Phi island day trip','Old Town and Big Buddha']},
+{x:1,n:'Bali',la:-8.41,lo:115.19,h:4500,f:900,m:{R:3,N:3,S:2,F:2,A:2},hl:['Ubud rice terraces and temples','Uluwatu temple sunset','Nusa Penida and beach clubs']},
+{x:1,n:'Maldives',la:4.18,lo:73.51,h:18000,f:3000,m:{R:3,N:2,A:1,F:1},hl:['Overwater villa and lagoon','Snorkelling and diving','Sandbank picnic and sunset cruise']},
+{x:1,n:'Kathmandu',la:27.717,lo:85.324,h:2500,f:600,m:{S:3,E:3,N:2,A:2},hl:['Pashupatinath and Boudhanath','Patan and Bhaktapur squares','Nagarkot sunrise view']},
+{x:1,n:'Paro, Bhutan',la:27.43,lo:89.41,h:5500,f:1200,m:{S:3,N:3,R:2,E:2,A:2},hl:["Tiger's Nest monastery hike",'Paro Dzong and National Museum','Thimphu day trip']},
+{x:1,n:'Colombo, Sri Lanka',la:6.927,lo:79.861,h:4000,f:800,m:{R:2,E:2,N:2,F:2,S:1},hl:['Colombo Fort and Galle Face','Kandy and Temple of the Tooth','Galle Fort and beaches']},
+{x:1,n:'Da Nang, Vietnam',la:16.05,lo:108.2,h:3500,f:700,m:{R:3,F:2,E:2,N:2},hl:['My Khe beach and Marble Mountains','Hoi An ancient town','Ba Na Hills Golden Bridge']},
+{x:1,n:'Istanbul',la:41.008,lo:28.978,h:6500,f:1400,m:{E:3,F:2,S:2,R:1},hl:['Hagia Sophia and Blue Mosque','Grand Bazaar and Bosphorus cruise','Topkapi Palace and Galata']},
+{x:1,n:'Cairo',la:30.044,lo:31.236,h:4500,f:900,m:{E:3,A:1,S:1},hl:['Giza pyramids and Sphinx','Egyptian Museum','Khan el-Khalili and Nile dinner']},
+{x:1,n:'Paris',la:48.857,lo:2.352,h:12000,f:2200,m:{E:3,F:2,R:2},hl:['Eiffel Tower and Seine cruise','Louvre and Montmartre','Versailles day trip']},
+{x:1,n:'London',la:51.507,lo:-0.128,h:13000,f:2400,m:{E:3,F:3},hl:['British Museum and Tower of London','Westminster and Thames walk','West End show and Borough Market']},
+{x:1,n:'Rome',la:41.903,lo:12.496,h:10000,f:1900,m:{E:3,F:2,S:2,R:1},hl:['Colosseum and Roman Forum','Vatican Museums and St Peter Basilica','Trevi and Trastevere food walk']},
+{x:1,n:'Interlaken, Switzerland',la:46.686,lo:7.863,h:18000,f:3500,m:{N:3,A:3,R:3},hl:['Jungfraujoch train','Lake Brienz and Thun cruise','Paragliding and Grindelwald hikes']},
+{x:1,n:'Tokyo',la:35.68,lo:139.69,h:10000,f:2000,m:{F:3,E:3,S:1,R:1},hl:['Senso-ji and Shibuya crossing','Akihabara and teamLab','Day trip to Mount Fuji']},
+{x:1,n:'New York',la:40.713,lo:-74.006,h:22000,f:3500,m:{F:3,E:3},hl:['Times Square and Central Park','Statue of Liberty and museums','Brooklyn Bridge and Broadway']},
+{x:1,n:'Sydney',la:-33.87,lo:151.21,h:14000,f:2500,m:{F:3,N:2,R:2,A:2},hl:['Opera House and Harbour Bridge','Bondi beach walk','Blue Mountains day trip']},
+{x:1,n:'Cape Town',la:-33.925,lo:18.424,h:8000,f:1600,m:{N:3,A:3,R:2,E:2},hl:['Table Mountain','Cape Point and penguins','Winelands tasting']},
+{n:'Coorg',la:12.4,lo:75.7,h:2800,f:500,m:{N:3,R:3,A:1},hl:['Abbey Falls and coffee estates','Dubare elephant camp']},
+{n:'Wayanad',la:11.7,lo:76.1,h:2600,f:450,m:{N:3,R:3,A:2},hl:['Edakkal Caves and Banasura Dam','Chembra Peak trek']},
+{n:'Chikmagalur',la:13.3,lo:75.8,h:2800,f:450,m:{N:3,R:3,A:2},hl:['Mullayanagiri trek','Coffee plantation stay']},
+{n:'Ooty',la:11.4,lo:76.7,h:2800,f:450,m:{N:3,R:3,F:1},hl:['Nilgiri mountain train','Botanical Garden and Ooty Lake']},
+{n:'Kodaikanal',la:10.2,lo:77.5,h:2600,f:450,m:{N:3,R:3},hl:['Coaker Walk and Pillar Rocks','Kodai Lake boating']},
+{n:'Kabini and Nagarhole',la:11.9,lo:76.3,h:4500,f:600,m:{N:3,A:3,R:2},hl:['Jungle safari','Kabini backwater boat ride']},
+{n:'Gokarna',la:14.5,lo:74.3,h:2000,f:400,m:{R:3,S:2,N:2,F:1},hl:['Om and Kudle beaches','Mahabaleshwar temple']},
+{n:'Alleppey backwaters',la:9.5,lo:76.3,h:3500,f:500,m:{R:3,N:3,F:1},hl:['Houseboat cruise','Marari beach']},
+{n:'Thekkady',la:9.6,lo:77.2,h:3000,f:450,m:{N:3,A:2,R:2},hl:['Periyar lake boat safari','Spice plantation walk']},
+{n:'Andaman Islands',la:11.6,lo:92.7,h:5500,f:700,m:{R:3,N:3,A:3,F:2},hl:['Radhanagar beach, Havelock','Snorkelling at Elephant Beach']},
+{n:'Pondicherry',la:11.9,lo:79.8,h:3000,f:600,m:{R:3,F:2,E:2,S:2},hl:['French Quarter walk','Auroville and Paradise beach']},
+{n:'Araku Valley',la:18.3,lo:83,h:2200,f:400,m:{N:3,R:2,A:1},hl:['Borra Caves and coffee museum','Valley train ride']},
+{n:'Mahabaleshwar',la:17.9,lo:73.7,h:3000,f:450,m:{N:3,R:3,F:1},hl:['Venna Lake and Arthur Seat','Strawberry farms']},
+{n:'Tarkarli and Konkan',la:16,lo:73.5,h:2500,f:450,m:{R:3,N:2,A:2},hl:['Scuba at Tarkarli beach','Sindhudurg Fort']},
+{n:'Matheran',la:19,lo:73.3,h:2800,f:450,m:{N:3,R:3},hl:['Vehicle-free hill walks','Toy train and Echo Point']},
+{n:'Pachmarhi',la:22.5,lo:78.4,h:2500,f:400,m:{N:3,R:3,A:2,E:1},hl:['Satpura hills and waterfalls','Pandav caves']},
+{n:'Kanha National Park',la:22.3,lo:80.6,h:4500,f:600,m:{N:3,A:3,R:1},hl:['Tiger safari','Sunrise in the sal forest']},
+{n:'Bandhavgarh',la:23.7,lo:81,h:5000,f:600,m:{N:3,A:3},hl:['Tiger safari','Bandhavgarh Fort']},
+{n:'Ranthambore',la:26,lo:76.5,h:5000,f:600,m:{N:3,A:3,E:1},hl:['Tiger safari','Ranthambore Fort']},
+{n:'Jaisalmer',la:26.9,lo:70.9,h:3000,f:450,m:{A:3,E:3,F:2,R:1},hl:['Sam sand dunes camp','Jaisalmer Fort and havelis']},
+{n:'Jim Corbett',la:29.5,lo:78.8,h:4000,f:550,m:{N:3,A:3,R:2},hl:['Jeep safari','Corbett Falls and Kosi river']},
+{n:'Nainital',la:29.4,lo:79.5,h:3000,f:450,m:{N:3,R:3,F:1},hl:['Naini Lake boating','Snow View point']},
+{n:'Auli',la:30.5,lo:79.6,h:3000,f:450,m:{A:3,N:3,R:2},hl:['Skiing and gondola','Nanda Devi views']},
+{n:'Dharamshala and McLeodganj',la:32.2,lo:76.3,h:2500,f:450,m:{S:3,N:3,R:3},hl:['Dalai Lama temple','Triund trek']},
+{n:'Spiti Valley',la:32.2,lo:78,h:2500,f:500,m:{A:3,N:3,S:2},hl:['Key and Tabo monasteries','Chandratal lake']},
+{n:'Leh Ladakh',la:34.2,lo:77.6,h:3500,f:600,m:{A:3,N:3,S:2,E:2},hl:['Pangong Lake','Khardung La and monasteries']},
+{n:'Srinagar and Kashmir',la:34.1,lo:74.8,h:4000,f:600,m:{N:3,R:3,F:1,E:1},hl:['Dal Lake shikara ride','Gulmarg gondola']},
+{n:'Kasol',la:32,lo:77.3,h:2000,f:450,m:{N:3,R:3,A:2},hl:['Parvati river walks','Kheerganga trek']},
+{n:'Varanasi',la:25.3,lo:83,h:2500,f:400,m:{S:3,E:3},hl:['Ganga aarti at Dashashwamedh','Dawn boat ride on the ghats']},
+{n:'Amritsar',la:31.6,lo:74.9,h:2500,f:400,m:{S:3,E:3,F:1},hl:['Golden Temple','Wagah border ceremony']},
+{n:'Agra',la:27.2,lo:78,h:3000,f:450,m:{E:3,F:1},hl:['Taj Mahal at sunrise','Agra Fort and Mehtab Bagh']},
+{n:'Darjeeling',la:27,lo:88.3,h:3000,f:450,m:{N:3,R:3,E:1,S:1},hl:['Tiger Hill sunrise','Toy train and tea gardens']},
+{n:'Gangtok',la:27.3,lo:88.6,h:3500,f:500,m:{N:3,R:3,A:2,S:2},hl:['Tsomgo Lake and Nathula','Rumtek monastery']},
+{n:'Shillong and Cherrapunji',la:25.3,lo:91.7,h:3000,f:450,m:{N:3,A:2,R:2},hl:['Double-decker root bridges','Dawki river boat ride']},
+{n:'Kaziranga',la:26.6,lo:93.4,h:4500,f:500,m:{N:3,A:3},hl:['Elephant and jeep safari','One-horned rhino spotting']},
+{n:'Tawang',la:27.6,lo:91.9,h:3000,f:500,m:{N:3,S:3,A:2},hl:['Tawang Monastery','Sela Pass and Madhuri Lake']},
+{n:'Puri and Konark',la:19.8,lo:85.8,h:2500,f:400,m:{S:3,E:3,R:2},hl:['Jagannath temple and beach','Konark Sun Temple']},
+{n:'Sundarbans',la:22,lo:88.8,h:3500,f:500,m:{N:3,A:2,R:1},hl:['Mangrove boat safari','Tiger reserve watchtowers']}
+];
+const MOODS=[['E','Educational','History, heritage, museums'],['F','Fun','Beaches, city life, nightlife'],['R','Relaxing','Slow days, views, good sleep'],['A','Adventure','Treks, safaris, water sports'],['S','Spiritual','Temples, ghats, yoga'],['N','Nature','Hills, wildlife, open skies']];
+const PRESETS=[3000,7000,15000,30000,75000,150000];
+const CUR={INR:1,USD:83,EUR:90,GBP:105,AED:22.6,SGD:62,AUD:55,CAD:61,JPY:0.55},SYM={INR:'₹',USD:'$',EUR:'€',GBP:'£',AED:'AED ',SGD:'S$',AUD:'A$',CAD:'C$',JPY:'¥'};
+function money(n){const c=st.cur;return SYM[c]+Math.round(n/CUR[c]).toLocaleString(c==='INR'?'en-IN':'en-US')}
+function keep(){const g=i=>$(i)?$(i).value:'';st.days=g('dy');st.people=g('pp');if(st.custom&&+g('cb'))st.budget=+g('cb')*CUR[st.cur]}
+let st={step:1,name:'',email:'',origin:'Anand',budget:7000,custom:false,days:'',people:'',cur:'INR',moods:[],mode:'any',pick:0};
+try{const s=JSON.parse(localStorage.getItem('wt_user')||'{}');if(s.name){st.name=s.name;st.email=s.email||'';}}catch(e){}
+const $=id=>document.getElementById(id), app=$('app');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr=n=>money(n);
+const hrs=h=>{const m=Math.round(h*60);return Math.floor(m/60)+'h '+(m%60?m%60+'m':'')};
+function hav(a,b){const r=x=>x*Math.PI/180,R=6371,dl=r(b[0]-a[0]),dn=r(b[1]-a[1]);const q=Math.sin(dl/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
+function modes(km,n){ // km = one-way road km; costs are per person, round trip
+ const cars=Math.ceil(n/4),o=[];
+ o.push({k:'car',l:'Car (self or cab)',c:cars*km*2*10/n,t:km/55});
+ o.push({k:'train',l:'Train',c:Math.max(250,km*1.6)*2,t:km/50+0.5});
+ o.push({k:'bus',l:'Bus',c:Math.max(200,km*1.3)*2,t:km/45});
+ if(km>3500)o.length=0;
+ if(km>=450){const a=km/1.3;o.push({k:'flight',l:'Flight',c:(2200+a*3.5)*2,t:a/800+3+(a>4000?2:0)})}
+ return o}
+function build(){
+ const O=CITIES[st.origin],n=st.people,nights=Math.max(1,st.days-1),rooms=Math.ceil(n/2),res=[];
+ for(const d of D){
+  const air=hav(O,[d.la,d.lo]);if(air<40)continue;const km=air*1.3;
+  const LIM={car:700,bus:1200,train:3500,flight:1e9};
+  let ms=modes(km,n).filter(m=>m.t<=6+st.days*4&&km<=LIM[m.k]&&(m.k==='flight'||!d.x));
+  if(st.mode!=='any')ms=ms.filter(m=>m.k===st.mode);
+  if(!ms.length)continue;
+  ms.sort((a,b)=>a.c-b.c);const m=ms[0];
+  const hotel=d.h*rooms*nights/n,food=d.f*st.days,local=250*st.days,total=m.c+hotel+food+local;
+  const sc=st.moods.length?st.moods.reduce((s,k)=>s+(d.m[k]||0),0)/(3*st.moods.length):0.5;
+  res.push({d,km,m,all:modes(km,n),hotel,food,local,total,sc,ok:total<=st.budget});
+ }
+ const ok=res.filter(r=>r.ok).sort((a,b)=>b.sc-a.sc||a.total-b.total);
+ return ok.length?ok:res.sort((a,b)=>a.total-b.total).slice(0,3)}
+function prog(){$('prog').innerHTML=[1,2,3,4,5].map(i=>`<b class="${i<=st.step?'on':''}"></b>`).join('')}
+function save(){try{localStorage.setItem('wt_user',JSON.stringify({name:st.name,email:st.email}))}catch(e){}}
+function go(s){st.step=s;render();window.scrollTo(0,0)}
+function nav(back,label,fn){return `<div class="nav">${back?`<button class="btn ghost" onclick="go(${st.step-1})">Back</button>`:'<span></span>'}<button class="btn" onclick="${fn}">${label}</button></div>`}
+function render(){prog();
+ if(st.step===1){app.innerHTML=`<div class="card"><h2>Let's find your next getaway</h2><p class="sub">Sign in so we can save your trip.</p>
+ <label for="nm">Your name</label><input id="nm" autocomplete="name" value="${esc(st.name)}">
+ <label for="em">Email</label><input id="em" type="email" autocomplete="email" value="${esc(st.email)}">
+ <div class="err" id="err" role="alert"></div>${nav(false,'Sign in','s1()')}
+ <p class="note">Demo sign-in: details stay in this browser only.</p></div>`}
+ if(st.step===2){app.innerHTML=`<div class="card"><h2>Hi ${esc(st.name.split(' ')[0])}, where are you starting from?</h2><p class="sub">Start typing your city, anywhere in India or the world. Distances and travel costs are worked out from here.</p>
+ <label for="og">Start location</label><input id="og" list="cl" autocomplete="off" placeholder="Any city, town or village" value="${esc(st.origin)}"><datalist id="cl">${Object.keys(CITIES).sort().map(c=>`<option value="${esc(c)}">`).join('')}</datalist><p class="note">Not in the suggestions? Just type the place name (add the state for a small village) and we will find it.</p>
+ <div class="err" id="err" role="alert"></div>${nav(true,'Next: budget','s2()')}</div>`}
+ if(st.step===3){app.innerHTML=`<div class="card"><h2>What's your budget?</h2><p class="sub">Total per person for the whole trip: travel, stay and food.</p>
+ <label for="cu">Currency</label><select id="cu" onchange="keep();st.cur=this.value;render()">${Object.keys(CUR).map(c=>`<option ${c===st.cur?'selected':''}>${c}</option>`).join('')}</select><label>Budget per person</label>
+ <div class="chips" id="pr">${PRESETS.map(p=>`<button class="chip" aria-pressed="${!st.custom&&st.budget===p}" onclick="keep();st.custom=false;st.budget=${p};render()">${inr(p)}</button>`).join('')}<button class="chip" aria-pressed="${st.custom}" onclick="keep();st.custom=true;render()">Enter my own</button></div>
+ ${st.custom?`<label for="cb">Your budget per person (${st.cur})</label><input id="cb" type="number" min="1" placeholder="e.g. 20000" value="${Math.round(st.budget/CUR[st.cur])}">`:''}
+ <div class="row"><div><label for="dy">Number of days</label><input id="dy" type="number" min="1" max="60" placeholder="e.g. 4" value="${st.days}"></div>
+ <div><label for="pp">Number of travellers</label><input id="pp" type="number" min="1" max="500" placeholder="e.g. 20" value="${st.people}"></div></div>
+ <div class="err" id="err" role="alert"></div>${nav(true,'Next: mood','s3()')}</div>`}
+ if(st.step===4){app.innerHTML=`<div class="card"><h2>What kind of holiday do you want?</h2><p class="sub">Pick your mood first: we choose places that match it. How you travel sets how far we look. Car stays nearby, train goes across India, and flights can go abroad.</p>
+ <div class="moods">${MOODS.map(([k,l,d])=>`<button class="mood" aria-pressed="${st.moods.includes(k)}" onclick="tm('${k}')"><strong>${l}</strong><span>${d}</span></button>`).join('')}</div>
+ <label>Travel by</label><div class="chips">${[['any','Best price'],['car','Car (nearby)'],['train','Train (far, in India)'],['bus','Bus (regional)'],['flight','Flight (anywhere)']].map(([k,l])=>`<button class="chip" aria-pressed="${st.mode===k}" onclick="st.mode='${k}';render()">${l}</button>`).join('')}</div>
+ <div class="err" id="err" role="alert"></div>${nav(true,'Show my plan','s4()')}</div>`}
+ if(st.step===5)plan()}
+function s1(){const n=$('nm').value.trim(),e=$('em').value.trim();if(!n||!/\S+@\S+\.\S+/.test(e)){$('err').textContent='Enter your name and a valid email to continue.';return}st.name=n;st.email=e;save();go(2)}
+async function s2(){const raw=$('og').value.trim().slice(0,60),v=raw.toLowerCase(),a=(ALIAS[v]||v).toLowerCase(),k=Object.keys(CITIES).find(c=>c.toLowerCase()===a),e=$('err');
+ if(k){st.origin=k;return go(3)}
+ if(!raw){e.textContent='Enter your start city.';return}
+ e.textContent='Looking up '+raw+'...';
+ try{const sm=await claude.use('sample');if(!sm){e.textContent='Place search is not available here. Pick the nearest city from the suggestions.';return}
+  const r=await sm.json('Find this place on a map: "'+raw.replace(/"/g,'')+'". If several places share the name, pick the best-known one, preferring India. Reply with only JSON: {"found":true,"name":"Place, State, Country","lat":0,"lng":0} using real coordinates, or {"found":false}.',{modelTier:'quick'});
+  if(!r||!r.found||!isFinite(r.lat)||!isFinite(r.lng)||Math.abs(r.lat)>90||Math.abs(r.lng)>180){e.textContent='Could not find "'+raw+'". Check the spelling or add the state, for example "Anand, Gujarat".';return}
+  const nm=String(r.name||raw).slice(0,80);CITIES[nm]=[+r.lat,+r.lng];st.origin=nm;go(3)
+ }catch(x){e.textContent=x&&x.code==='not_granted'?'Allow place search to continue, or pick a city from the suggestions.':'Place search failed. Try again or pick a nearby city from the list.'}}
+function s3(){let b=st.budget;if(st.custom){const v=+$('cb').value;if(!v||v*CUR[st.cur]<500){$('err').textContent='Enter a budget of at least ₹500 or the equivalent.';return}b=v*CUR[st.cur]}const d=Math.floor(+$('dy').value),p=Math.floor(+$('pp').value);if(!(d>=1&&d<=60)){$('err').textContent='Enter the number of days (1 to 60).';return}if(!(p>=1&&p<=500)){$('err').textContent='Enter the number of travellers (1 to 500).';return}st.budget=b;st.days=d;st.people=p;go(4)}
+function tm(k){st.moods=st.moods.includes(k)?st.moods.filter(x=>x!==k):[...st.moods,k];render()}
+function s4(){if(!st.moods.length){$('err').textContent='Pick at least one mood.';return}st.pick=0;go(5)}
+function q(s){return encodeURIComponent(s)}
+function plan(){
+ const R=build();if(!R.length){app.innerHTML=`<div class="card"><h2>No trips match</h2><p class="sub">Try a different travel mode or more days.</p>${nav(true,'Edit','go(4)')}</div>`;return}
+ const r=R[Math.min(st.pick,R.length-1)],d=r.d,m=r.m,n=st.people,over=r.total-st.budget,city=d.n.split(/,| and /)[0];
+ const itin=[];for(let i=1;i<=st.days;i++){
+  const h=d.hl[(i-1)%d.hl.length];
+  itin.push(i===1?`Travel from ${st.origin} by ${m.l.toLowerCase()} (about ${hrs(m.t)}), check in, then ${h.toLowerCase()}.`:i===st.days?`Easy morning, last meal and shopping, then travel home (about ${hrs(m.t)}).`:h+'.')}
+ app.innerHTML=`<div class="pass"><div>${esc(st.name)}'s trip</div><h2>${esc(d.n)}</h2>
+ <div class="route">${esc(st.origin)} to ${esc(city)} · ${Math.round(r.km)} km · ${st.days} days · ${n} traveller${n>1?'s':''}</div>
+ <div class="tiles"><div><small>Per person</small><b>${inr(r.total)}</b></div><div><small>Group total</small><b>${inr(r.total*n)}</b></div><div><small>One-way by ${m.k}</small><b>${hrs(m.t)}</b></div></div>
+ <span class="tag ${over<=0?'ok':'bad'}">${over<=0?'Within budget: '+inr(-over)+' to spare':'Over budget by '+inr(over)+' per person'}</span></div>
+ ${R.length>1?`<section class="blk"><h3>Other trips for you</h3><div class="chips">${R.slice(0,6).map((x,i)=>`<button class="chip" aria-pressed="${i===st.pick}" onclick="st.pick=${i};render()">${esc(x.d.n)} · ${inr(x.total)}</button>`).join('')}</div></section>`:''}
+ <div class="card" style="margin-top:18px"><section class="blk" style="margin-top:0"><h3>Cost breakdown (per person)</h3><table>
+ <tr><td>Round trip by ${m.l.toLowerCase()}</td><td>${inr(m.c)}</td></tr>
+ <tr><td>Hotel, ${Math.max(1,st.days-1)} night${st.days>2?'s':''} (shared rooms)</td><td>${inr(r.hotel)}</td></tr>
+ <tr><td>Food, ${st.days} days</td><td>${inr(r.food)}</td></tr>
+ <tr><td>Local transport and entry tickets</td><td>${inr(r.local)}</td></tr>
+ <tr><th>Total</th><th>${inr(r.total)}</th></tr></table></section>
+ <section class="blk"><h3>Getting there</h3><div class="scroll"><table><tr><th>Mode</th><th>Time one-way</th><th>Cost per person</th></tr>
+ ${r.all.sort((a,b)=>a.c-b.c).map(x=>`<tr class="${x.k===m.k?'pick':''}"><td>${x.l}</td><td>${hrs(x.t)}</td><td>${inr(x.c)}</td></tr>`).join('')}</table></div></section>
+ <section class="blk"><h3>Day by day</h3><ol class="days">${itin.map(t=>`<li>${esc(t)}</li>`).join('')}</ol></section>
+ <section class="blk"><h3>Book hotels</h3><div class="links">
+ <a href="https://www.booking.com/searchresults.html?ss=${q(city)}&group_adults=${n}" target="_blank" rel="noopener">Booking.com in ${esc(city)}</a>
+ <a href="https://www.google.com/travel/hotels/${q(city)}" target="_blank" rel="noopener">Google Hotels</a>
+ <a href="https://www.google.com/maps/search/hotels+in+${q(city)}" target="_blank" rel="noopener">Hotels on map</a></div></section>
+ <section class="blk"><h3>Book your travel</h3><div class="links">
+ <a href="https://www.google.com/search?q=${q('outstation cab '+st.origin+' to '+city)}" target="_blank" rel="noopener">Book a cab or driver</a>
+ <a href="https://www.irctc.co.in/nget/train-search" target="_blank" rel="noopener">Trains on IRCTC</a>
+ <a href="https://www.redbus.in/" target="_blank" rel="noopener">Buses on redBus</a>
+ ${r.all.some(x=>x.k==='flight')?`<a href="https://www.google.com/travel/flights?q=${q('Flights from '+st.origin+' to '+city)}" target="_blank" rel="noopener">Search flights</a>`:''}</div>
+ <p class="note">Costs are estimates from average fares and distance, and currency rates are approximate. Check live prices before you pay.${n>=10?' For groups of 10 or more, ask hotels and operators for group rates, and look at a tempo traveller or coach.':''}${(d.x||!isIN(st.origin))?' This looks like an international trip: check passport, visa and travel insurance requirements.':''}</p></section></div>
+ <div class="nav"><button class="btn ghost" onclick="go(4)">Change mood</button><button class="btn" onclick="go(3)">Change budget</button></div>`}
+render();
+</script>
+</body>
+</html>
